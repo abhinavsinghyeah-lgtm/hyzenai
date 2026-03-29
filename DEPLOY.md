@@ -297,3 +297,160 @@ npm install
 npm run build
 pm2 restart hyzen-ai-frontend
 
+---
+
+## 11. Fix: hyzen-ai-frontend errored
+
+**Step 1 — Check logs:**
+
+```bash
+pm2 logs hyzen-ai-frontend --lines 50
+```
+
+**Step 2 — Try rebuilding:**
+
+```bash
+cd /home/ubuntu/hyzen-ai/frontend
+npm run build
+```
+
+**Step 3 — Delete and re-start if still broken:**
+
+```bash
+pm2 delete hyzen-ai-frontend
+```
+
+```bash
+cd /home/ubuntu/hyzen-ai/frontend
+npm run build
+```
+
+```bash
+pm2 start npm --name hyzen-ai-frontend -- run start
+```
+
+```bash
+pm2 save
+```
+
+**Step 4 — Confirm it's running:**
+
+```bash
+pm2 status
+```
+
+---
+
+## 12. Fix: Module not found '@/components' build error
+
+This means `jsconfig.json` was missing. It's now fixed in the repo. Run:
+
+```bash
+cd /home/ubuntu/hyzen-ai
+git pull
+```
+
+```bash
+cd /home/ubuntu/hyzen-ai/frontend
+npm run build
+```
+
+```bash
+pm2 delete hyzen-ai-frontend
+```
+
+```bash
+pm2 start npm --name hyzen-ai-frontend -- run start
+```
+
+```bash
+pm2 save
+```
+
+```bash
+pm2 status
+```
+
+---
+
+## 13. FINAL FIX — Nuclear Clean Rebuild (Run This If Nothing Else Works)
+
+The build is confirmed working. On the VPS the issue is a stale `.next` cache, an incomplete git pull, or missing `.env.local`. Run every command below in exact order, one at a time:
+
+**Step 1 — Kill broken frontend process:**
+
+```bash
+pm2 delete hyzen-ai-frontend
+```
+
+**Step 2 — Pull latest code:**
+
+```bash
+cd /home/ubuntu/hyzen-ai && git pull
+```
+
+**Step 3 — Verify jsconfig.json is present (must print the file contents):**
+
+```bash
+cat /home/ubuntu/hyzen-ai/frontend/jsconfig.json
+```
+
+> You must see this before continuing:
+> ```
+> {
+>   "compilerOptions": {
+>     "baseUrl": ".",
+>     "paths": {
+>       "@/*": ["./*"]
+>     }
+>   }
+> }
+> ```
+> If the file is missing, git pull did not work — re-run Step 2.
+
+**Step 4 — Wipe the stale build cache:**
+
+```bash
+rm -rf /home/ubuntu/hyzen-ai/frontend/.next
+```
+
+**Step 5 — Wipe and cleanly reinstall node_modules:**
+
+```bash
+rm -rf /home/ubuntu/hyzen-ai/frontend/node_modules && cd /home/ubuntu/hyzen-ai/frontend && npm install
+```
+
+**Step 6 — Write the .env.local file (overwrites any broken version):**
+
+```bash
+echo "NEXT_PUBLIC_API_URL=http://18.232.64.195:3000" > /home/ubuntu/hyzen-ai/frontend/.env.local
+```
+
+**Step 7 — Build (must print "Compiled successfully"):**
+
+```bash
+cd /home/ubuntu/hyzen-ai/frontend && npm run build
+```
+
+**Step 8 — Start frontend and save:**
+
+```bash
+pm2 start npm --name hyzen-ai-frontend -- run start && pm2 save
+```
+
+**Step 9 — Confirm both processes are online:**
+
+```bash
+pm2 status
+```
+
+> Both `hyzen-ai` and `hyzen-ai-frontend` must show `online`.
+
+**Step 10 — Verify the app is reachable:**
+
+```bash
+curl -I http://localhost:4000
+```
+
+> Must return `HTTP/1.1 200 OK`. App is live at `http://18.232.64.195:4000`
+
