@@ -128,6 +128,12 @@ npm run build
 pm2 restart hyzen-ai-frontend
 ```
 
+**VPS — backend personality update (restarts to reload personality.txt):**
+
+```bash
+cd /home/ubuntu/hyzen-ai && git pull && pm2 restart hyzen-ai
+```
+
 ---
 
 ---
