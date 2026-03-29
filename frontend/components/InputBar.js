@@ -22,18 +22,32 @@ export default function InputBar({ onSend, isLoading }) {
 
   return (
     <div style={{
-      borderTop: '1px solid #e8e8e8',
-      padding: '14px 24px 18px',
+      padding: '12px 24px 20px',
       backgroundColor: '#fff',
       flexShrink: 0,
     }}>
       <div style={{
-        maxWidth: '720px',
+        maxWidth: '760px',
         margin: '0 auto',
         display: 'flex',
         gap: '10px',
         alignItems: 'flex-end',
-      }}>
+        backgroundColor: '#fff',
+        border: '1.5px solid #e0e0e0',
+        borderRadius: '16px',
+        padding: '10px 12px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+        transition: 'border-color 0.15s, box-shadow 0.15s',
+      }}
+        onFocusCapture={e => {
+          e.currentTarget.style.borderColor = '#2563eb';
+          e.currentTarget.style.boxShadow = '0 2px 12px rgba(37,99,235,0.12)';
+        }}
+        onBlurCapture={e => {
+          e.currentTarget.style.borderColor = '#e0e0e0';
+          e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)';
+        }}
+      >
         <textarea
           value={value}
           onChange={e => setValue(e.target.value)}
@@ -42,36 +56,35 @@ export default function InputBar({ onSend, isLoading }) {
             e.target.style.height = 'auto';
             e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
           }}
-          placeholder="Message Hyzen…"
+          placeholder="Message Hyzen..."
           disabled={isLoading}
           rows={1}
           style={{
             flex: 1,
-            padding: '12px 16px',
-            border: '1px solid #e0e0e0',
-            borderRadius: '14px',
-            fontSize: '14px',
-            lineHeight: '1.5',
+            border: 'none',
+            padding: '2px 4px',
+            fontSize: '15px',
+            lineHeight: '1.6',
             resize: 'none',
-            minHeight: '48px',
+            minHeight: '28px',
             maxHeight: '160px',
-            backgroundColor: '#fafafa',
+            backgroundColor: 'transparent',
             color: '#1a1a1a',
-            transition: 'border-color 0.15s',
+            boxShadow: 'none',
           }}
         />
         <button
           onClick={handleSend}
           disabled={!canSend}
           style={{
-            width: '44px',
-            height: '44px',
+            width: '36px',
+            height: '36px',
             flexShrink: 0,
-            borderRadius: '12px',
+            borderRadius: '10px',
             border: 'none',
-            backgroundColor: canSend ? '#2563eb' : '#e0e0e0',
-            color: canSend ? '#fff' : '#a0a0a0',
-            fontSize: '20px',
+            backgroundColor: canSend ? '#2563eb' : '#ebebeb',
+            color: canSend ? '#fff' : '#b0b0b0',
+            fontSize: '18px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -81,11 +94,12 @@ export default function InputBar({ onSend, isLoading }) {
           ↑
         </button>
       </div>
-      <div style={{ maxWidth: '720px', margin: '6px auto 0', textAlign: 'center' }}>
-        <span style={{ fontSize: '11px', color: '#c8c8c8' }}>
+      <div style={{ maxWidth: '760px', margin: '7px auto 0', textAlign: 'center' }}>
+        <span style={{ fontSize: '11px', color: '#d0d0d0' }}>
           Enter to send · Shift+Enter for new line
         </span>
       </div>
     </div>
   );
 }
+
