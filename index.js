@@ -2,19 +2,26 @@ require('dotenv').config();
 
 const express = require('express');
 const chatRoute = require('./src/routes/chat');
+const memoryRoute = require('./src/routes/memory');
+const personalityRoute = require('./src/routes/personality');
+const { chatLimiter } = require('./src/middleware/rateLimiter');
+const { requestLogger } = require('./src/middleware/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+app.use(requestLogger);
 
 // Routes
-app.use('/chat', chatRoute);
+app.use('/chat', chatLimiter, chatRoute);
+app.use('/memory', memoryRoute);
+app.use('/personality', personalityRoute);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', uptime: Math.floor(process.uptime()) + 's' });
 });
 
 // Global error handler
