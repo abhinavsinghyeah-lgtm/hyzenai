@@ -38,8 +38,8 @@ async function handleChat(req, res) {
   const sessionId = (typeof session_id === 'string' && session_id.trim()) ? session_id.trim() : 'default';
   const recentMessages = getSessionBuffer(sessionId);
 
-  // 1. Retrieve relevant + personal memories
-  const memories = retrieveRelevantMemories(userMessage);
+  // 1. Retrieve relevant + personal memories (async — may use semantic search)
+  const memories = await retrieveRelevantMemories(userMessage);
 
   // 2. Mark retrieved memories as used
   for (const mem of memories.relevant) updateLastUsed(mem.id);

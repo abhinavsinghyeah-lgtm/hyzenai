@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 const chatRoute = require('./src/routes/chat');
 const memoryRoute = require('./src/routes/memory');
 const personalityRoute = require('./src/routes/personality');
@@ -9,6 +10,12 @@ const { requestLogger } = require('./src/middleware/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// CORS — restrict to specific origin in production via CORS_ORIGIN env var
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+}));
 
 // Middleware
 app.use(express.json());

@@ -61,7 +61,7 @@ function readMemoryFile(filePath) {
 // Public: persist a new memory entry
 // ---------------------------------------------------------------------------
 
-function saveMemory({ conversation, summary, key_points, tags, type, importance }) {
+function saveMemory({ conversation, summary, key_points, tags, type, importance, embedding }) {
   ensureDirs();
 
   const index = readIndex();
@@ -79,6 +79,7 @@ function saveMemory({ conversation, summary, key_points, tags, type, importance 
     file_path: filePath,
     type: type === 'personal' ? 'personal' : 'fact',
     importance: typeof importance === 'number' ? Math.min(10, Math.max(1, importance)) : 5,
+    embedding: Array.isArray(embedding) ? embedding : null,
     created_at: now,
     last_used: now,
   };
@@ -86,7 +87,7 @@ function saveMemory({ conversation, summary, key_points, tags, type, importance 
   index.push(entry);
   writeIndex(index);
 
-  console.log(`[Memory] Saved: ${id} — "${entry.summary}"`);
+  console.log(`[Memory] Saved: ${id} — "${entry.summary}" (embedding: ${embedding ? 'yes' : 'no'})`);
   return entry;
 }
 
@@ -99,6 +100,19 @@ function updateLastUsed(id) {
   const entry = index.find(e => e.id === id);
   if (entry) {
     entry.last_used = new Date().toISOString();
+    writeIndex(index);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Public: store a computed embedding into an existing memory entry
+// ---------------------------------------------------------------------------
+
+function updateEmbedding(id, embedding) {
+  const index = readIndex();
+  const entry = index.find(e => e.id === id);
+  if (entry && Array.isArray(embedding)) {
+    entry.embedding = embedding;
     writeIndex(index);
   }
 }
@@ -142,20 +156,33 @@ ${conversationText}`;
     return;
   }
 
-  saveMemory({
+  // Generate embedding for semantic retrieval (non-critical — fallback to null on failure)
+  const embeddingService = require('./embeddingService');
+  const embeddingText = `${meta.summary} ${(meta.key_points || []).join(' ')}`;
+  const embedding = await embeddingService.generateEmbedding(embeddingText).catch(() => null);
+
+  const entry = saveMemory({
     conversation,
     summary: meta.summary,
     key_points: meta.key_points,
     tags: meta.tags,
     type: meta.type,
     importance: meta.importance,
+    embedding,
   });
+
+  // Warm the embedding cache immediately so this session benefits right away
+  if (embedding) {
+    embeddingService.setCached(entry.id, embedding);
+  }
 }
 
 module.exports = {
   readIndex,
+  writeIndex,
   readMemoryFile,
   saveMemory,
   updateLastUsed,
+  updateEmbedding,
   generateAndSaveMemory,
 };
