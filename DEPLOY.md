@@ -270,7 +270,7 @@ NEXT_PUBLIC_API_URL=http://18.232.64.195:3000
 
 npm run build
 
-pm2 start npm --name hyzen-ai-frontend -- run start
+pm2 start npm --name hyzen-ai-frontend --cwd /home/ubuntu/hyzen-ai/frontend -- run start
 
 pm2 save
 
@@ -326,7 +326,7 @@ npm run build
 ```
 
 ```bash
-pm2 start npm --name hyzen-ai-frontend -- run start
+pm2 start npm --name hyzen-ai-frontend --cwd /home/ubuntu/hyzen-ai/frontend -- run start
 ```
 
 ```bash
@@ -360,7 +360,7 @@ pm2 delete hyzen-ai-frontend
 ```
 
 ```bash
-pm2 start npm --name hyzen-ai-frontend -- run start
+pm2 start npm --name hyzen-ai-frontend --cwd /home/ubuntu/hyzen-ai/frontend -- run start
 ```
 
 ```bash
@@ -432,10 +432,10 @@ echo "NEXT_PUBLIC_API_URL=http://18.232.64.195:3000" > /home/ubuntu/hyzen-ai/fro
 cd /home/ubuntu/hyzen-ai/frontend && npm run build
 ```
 
-**Step 8 — Start frontend and save:**
+**Step 8 — Start frontend and save (with correct working directory):**
 
 ```bash
-pm2 start npm --name hyzen-ai-frontend -- run start && pm2 save
+pm2 start npm --name hyzen-ai-frontend --cwd /home/ubuntu/hyzen-ai/frontend -- run start && pm2 save
 ```
 
 **Step 9 — Confirm both processes are online:**
